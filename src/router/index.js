@@ -11,6 +11,7 @@ import productRouter from './modules/product'
 import bannerRouter from './modules/banner'
 import agentRouter from './modules/agent'
 import auditRouter from './modules/audit'
+import picRouter from './modules/pic'
 // import rateRouter from './modules/rate'
 
 /** note: Submenu only appear when children.length>=1
@@ -89,5 +90,6 @@ export const asyncRouterMap = [
   agentRouter,
   auditRouter,
   bannerRouter,
+  picRouter,
   { path: '*', redirect: '/404', hidden: true }
 ]
