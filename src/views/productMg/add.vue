@@ -145,7 +145,7 @@
 <script>
 import { saveOrUpdate } from '@/api/product'
 import { deepClone } from '@/utils'
-
+import { uploader, previewImage, removeRemoteImage } from '@/utils/file-uploader.js' // eslint-disable-line no-unused-vars
 export default {
   name: 'AddOrEditProductPage',
   props: {
@@ -217,7 +217,6 @@ export default {
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-
           // 检查当前是新增还是保存
           let method = 'post'
           if (this.ruleForm.id || this.buttonText === '编辑') {
@@ -233,7 +232,7 @@ export default {
               })
 
               // 产品列表组件
-              let productIndexComp = this.$parent.$parent
+              const productIndexComp = this.$parent.$parent
               if (this.buttonText === '编辑' || productIndexComp.$options.name === 'ProductList') {
                 // 通知父组件中的监听回调方法
                 productIndexComp.$emit('saveNotify', true)
@@ -262,9 +261,23 @@ export default {
         const file = evt.target.files[0]
         reader.readAsDataURL(file)
         reader.onload = function(e) {
-          const result = this.result
-          self.ruleForm.icon = result.substring(result.indexOf(',') + 1, result.length)
-          self.ruleForm.iconContentType = file.type
+          // 上传照片到 Minio 服务器
+          uploader(file).then(response => {
+            // Toast.hide()
+            const { bucketName, fileName } = response
+            const fileUrl = `${bucketName}/${fileName}`
+            // imageList.push(fileUrl)
+            // imageList.push(file.type)
+            // imageList.push(previewImage(fileUrl))
+            // const result = this.result
+            self.ruleForm.iconUrl = fileUrl
+            self.ruleForm.iconContentType = file.type
+            // this.$set(this.imageList, name, imageList)
+          })
+            .catch(err => {
+              // Toast.hide()
+              console.error(err)
+            })
 
           self.$message({
             message: '上传成功！',
